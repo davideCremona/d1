@@ -1,0 +1,72 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+\section{The File Generation Script}
+In this section, the "fileGenerator.py" script will be described and analyzed. The script is available for the download at \url{http://www.mediafire.com/download/97zkno8562e983b/fileGenerator.py}
+  \subsection{The Idea}
+    The idea is to parse the input XML file using the module ElementTree\cite{elemtree} to:
+    \begin{enumerate}
+      \item Create a Task instance for each task described in the XML file
+      \item Add to each Task the edges that starts from that Task
+      \item For each possible configuration, output a new XML file in the user-specified directory.
+    \end{enumerate}
+    To manage the generation of each XML file, an array of xml "edge" tags is stored in each Task object. \\
+    To continue this description, it's necessary to give a definition to the concept of "configuration" of a Task.\\
+    A \textbf{configuration} is a subset of the elements of the edges array stored in a single Task.\\
+    The current configuration of a Task is represented as an integer variable that can have values from 1 to $2^n-1$ where 'n' is the number of edges in the array ($-1$ because the configuration \#0 is not considered).
+    This is because each configuration is seen as a binary number: the configuration '1' of a task with 2 edges is translated in the binary number '01'. Using this binary number as a mask, it is possible to select only the edges of the current configuration from the edges array and to put only these edges in the output XML file.
+  \subsection{Source Code}
+    The Source code of the File Generation script is divided in two files:
+    \begin{itemize}
+      \item fileGenerator.py that is the main script
+      \item Task.py that is the class representing the tasks
+    \end{itemize}
+    \subsubsection{fileGenerator.py}
+      This script is in charge to generate an XML file for each decision in the design space.\\
+      After some controls about the arguments and the existance of the input file, it will use the ElementTree\cite{elemtree} module to parse the XML input file:
+      %\lstinputlisting{} citare da 68 a 71
+      \lstinputlisting[language=Python, firstline=68, lastline=71]{../files/fileGenerator.py}
+      Once the file is parsed, a dictionary\cite{dictionary} (hash map) of components names is populated:
+      %\lstinputlisting{} citare da 73 ad 82
+      \lstinputlisting[language=Python, firstline=73, lastline=82]{../files/fileGenerator.py}
+      Then the dictionary\cite{dictionary} of tasks is created by reading the names binded to the second layer; Edges tags are stored in a list of Element\cite{elemtree} objects and added to the corresponding task. Finally, every task in the tasks dictionary\cite{dictionary} is linked to the next task to create a structure like a linked list.
+      %\lstinputlisting{} citare da 85 a 102
+      \lstinputlisting[language=Python, firstline=85, lastline=102]{../files/fileGenerator.py}
+      The output directory is created if it does not exists and the header for each XML file is created:
+      \lstinputlisting[language=Python, firstline=106, lastline=113]{../files/fileGenerator.py}
+      Now, some utilities variables are initialized (file counter, files names prefix, array of tasks) and the first file is generated:
+      \lstinputlisting[language=Python, firstline=115, lastline=124]{../files/fileGenerator.py}
+      At the end of the script there is the file generation loop. For each iteration the following instructions are executed:
+      \begin{enumerate}
+        \item Take the head of the tasks list and search for the first task that can increment his configuration.
+        \item If the task that has been returned is not null (None, in Python), then change his configuration and generate a new configuration file.
+        \item After the file generation, the list of edges is cleared to prepare a new file.
+      \end{enumerate}
+      The loop will end when there are no more tasks that can change.
+      Here it is the loop code:
+      \lstinputlisting[language=Python, firstline=126, lastline=139]{../files/fileGenerator.py}
+      There are two main functions in this script:
+      \begin{itemize}
+          \item \textbf{previous\_and\_next} That is in charge to return a list of elements composed by three tasks: prev, item and next. This function is used to convert the tasks dictionary\cite{dictionary} in a lined-list like structure.
+          This is the code:
+          \lstinputlisting[language=Python, firstline=23, lastline=27]{../files/fileGenerator.py}
+          \item \textbf{fileGeneration} That is in charge to write out every single XML file. It puts the edges in order of layer and then write the file. This is the code:
+          \lstinputlisting[language=Python, firstline=29, lastline=49]{../files/fileGenerator.py}
+      \end{itemize}
+
+    \subsubsection{Task.py}
+      This file contains a class that describes a generic Task. The main methods of this class are:
+      \begin{itemize}
+        \item \textbf{getConfiguration()}: Returns an array of xml edges corresponding to the current configuration, using a binary number as a mask to select the right edges.
+        \lstinputlisting[language=Python, firstline=26, lastline=36]{../files/Task.py}
+        \item \textbf{setNextConfiguration()}: This methods simply checks if the task has reached the maximum configuration and, if not, it will increase the self.currentConfiguration variable.
+        \item \textbf{getNextAvailable()}: This is the main method of the class. It allows the main script to generate every time a different XML file.
+        This is the flow:
+        \begin{enumerate}
+          \item If the current task can increment his configuration, then the method will return the current task.
+          \item If he cannot increment, then he has to reset the configuration (return to configuration \#1); Check if he is not the last task in the list. If the check returns true, then the next task available is null (None), otherwise the next task available is the one returned by calling getNextAvailable() from the next task in the list.\\
+          The code:
+          \lstinputlisting[language=Python, firstline=56, lastline=65]{../files/Task.py}
+        \end{enumerate}
+      \end{itemize}
+\end{document}

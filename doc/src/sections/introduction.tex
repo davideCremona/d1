@@ -1,0 +1,15 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+\section{Introduction}
+In this section will be given a small introduction on this work and his purpose.
+  \subsection{Scope}
+  The scope of this work is to automatize the design space exploration for mixed critical System on Chip. This is made by creating a tool that reads an XML file that describes all the design decisions that are not yet taken and produces multiple XML that represents all the possible decisions. The second step of this project consists in taking all the generated files and verify the feasibility of every single configuration with the use of a software called iNARK, as described in the paper \textit{Early Stage Interference Checking for Automatic Design Space Exploration of Mixed Critical Systems}\cite{paper}
+
+  \subsection{Implementation Decisions}
+  The project is divided in two main parts: \textbf{XML files generation} and \textbf{verification}. The two parts are implemented in two different scripting languages:
+  \begin{itemize}
+    \item \textbf{XML File Generation}: this script ("fileGenerator.py") is implemented in Python because it's a very simple language and can handle large amount of data with high performance.
+    \item \textbf{Verification}: this script ("d1.sh") is implemented using the bash shell scripting language because it has to iterate through all the generated files and has to call (./ call) iNARK to verify every single generated file.
+  \end{itemize}
+\end{document}

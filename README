@@ -1,0 +1,23 @@
+script principale: d1.sh
+comandi:
+  ./d1.sh help
+  stampa una serie di istruzioni su come richiamare e configurare lo script.
+
+  ./d1.sh xml_file_path output_directory_name
+  esegue lo script leggendo il file xml passato come primo argomento e mettendo in
+  output_directory_name/accepted i file che passano il setaccio di iNARK
+  output_directory_name/rejected i file che non  passano il setaccio.
+
+file di configurazione:
+  d1.cfg
+
+  E' un file di testo normalissimo dove si può impostare:
+   - high_priority_tasks: lista di task ad alta priorità (saranno i target) separati da spazi
+   - low_priority_tasks: lista di task a bassa priorità (saranno i source) separati da spazi
+   - iNARK_type: argomento "type" da passare ad iNARK
+   - iNARK_depth: argomento "depth" da passare ad iNARK
+   - iNARK_directory: path della directory dove è presente l'eseguibile di iNARK. Il percorso dev'essere relativo allo script d1.sh.
+
+script di appoggio
+  fileGenerator.py
+  genera i file xml da passare ad iNARK e li mette tutti nella directory passata a d1.sh.
